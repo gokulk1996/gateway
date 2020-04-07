@@ -3,8 +3,8 @@
 #
 # This configuration is used for unit/integration tests.
 #
-# More information on profiles: http://www.jhipster.tech/profiles/
-# More information on configuration properties: http://www.jhipster.tech/common-application-properties/
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
 # ===================================================================
@@ -15,7 +15,7 @@
 
 eureka:
     client:
-        enabled: true
+        enabled: false
     instance:
         appname: gateway
         instanceId: gateway:${spring.application.instance-id:${random.value}}
@@ -23,16 +23,16 @@ eureka:
 spring:
     application:
         name: gateway
-    jackson:
-        serialization.write_dates_as_timestamps: false
     cache:
         type: simple
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:h2:mem:gateway;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:mem:gateway;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
         name:
         username:
         password:
+        hikari:
+            auto-commit: false
     jpa:
         database-platform: io.github.jhipster.domain.util.FixedH2Dialect
         database: H2
@@ -45,18 +45,19 @@ spring:
                 implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         properties:
             hibernate.id.new_generator_mappings: true
+            hibernate.connection.provider_disables_autocommit: true
             hibernate.cache.use_second_level_cache: false
             hibernate.cache.use_query_cache: false
             hibernate.generate_statistics: true
             hibernate.hbm2ddl.auto: validate
+            hibernate.jdbc.time_zone: UTC
     data:
         elasticsearch:
-            cluster-name:
-            cluster-nodes:
             properties:
                 path:
-                    logs: target/elasticsearch/log
-                    data: target/elasticsearch/data
+                    home: target/elasticsearch
+    liquibase:
+        contexts: test
     mail:
         host: localhost
     messages:
@@ -65,23 +66,17 @@ spring:
         favicon:
             enabled: false
     thymeleaf:
-        mode: XHTML
+        mode: HTML
 
-liquibase:
-    contexts: test
 
 server:
     port: 10344
     address: localhost
 
-info:
-    project:
-        version: #project.version#
-
 # ===================================================================
 # JHipster specific properties
 #
-# Full reference is available at: http://www.jhipster.tech/common-application-properties/
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
 jhipster:
@@ -99,7 +94,8 @@ jhipster:
     security:
         authentication:
             jwt:
-                secret: 
+                # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
+                base64-secret: 
                 # Token is valid 24 hours
                 token-validity-in-seconds: 86400
     metrics: # DropWizard Metrics configuration, used by MetricsConfiguration
@@ -114,7 +110,7 @@ jhipster:
 # to have type-safe configuration, like in the JHipsterProperties above
 #
 # More documentation is available at:
-# http://www.jhipster.tech/common-application-properties/
+# https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-application:
+# application:

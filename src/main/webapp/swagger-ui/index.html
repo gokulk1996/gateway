@@ -20,7 +20,6 @@
     <script src='./dist/lib/backbone-min.js' type='text/javascript'></script>
     <script src='./dist/swagger-ui.min.js' type='text/javascript'></script>
     <script src='./dist/lib/highlight.9.1.0.pack.js' type='text/javascript'></script>
-    <script src='./dist/lib/highlight.9.1.0.pack.js' type='text/javascript'></script>
     <script src='./dist/lib/jsoneditor.min.js' type='text/javascript'></script>
     <script src='./dist/lib/marked.js' type='text/javascript'></script>
     <script src='./dist/lib/swagger-oauth.js' type='text/javascript'></script>
@@ -83,16 +82,8 @@
                 });
 
                 function addApiKeyAuthorization() {
-                    var interceptor = {
-                        requestInterceptor: {
-                            apply: function (requestObj) {
-                                var headers = requestObj.headers || {};
-                                headers['X-XSRF-TOKEN'] = getCSRF();
-                                return requestObj;
-                            }
-                        }
-                    };
-                    window.swaggerUi.options.requestInterceptor = interceptor.requestInterceptor
+                    var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("X-XSRF-TOKEN", getCSRF(), "header");
+                    window.swaggerUi.api.clientAuthorizations.add("key", apiKeyAuth);
                 }
 
                 function getCSRF() {
@@ -100,7 +91,7 @@
                     var ca = document.cookie.split(';');
                     for(var i=0; i<ca.length; i++) {
                         var c = ca[i];
-                        while (c.charAt(0)==' ') c = c.substring(1);
+                        while (c.charAt(0) === ' ') c = c.substring(1);
                         if (c.indexOf(name) !== -1) return c.substring(name.length,c.length);
                     }
                     return "";

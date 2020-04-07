@@ -90,7 +90,7 @@ public abstract class OAuth2TokenEndpointClientAdapter implements OAuth2TokenEnd
 
     protected String getClientSecret() {
         String clientSecret = oAuth2Properties.getWebClientConfiguration().getSecret();
-        if(clientSecret == null) {
+        if (clientSecret == null) {
             throw new InvalidClientException("no client-secret configured in application properties");
         }
         return clientSecret;
@@ -98,7 +98,7 @@ public abstract class OAuth2TokenEndpointClientAdapter implements OAuth2TokenEnd
 
     protected String getClientId() {
         String clientId = oAuth2Properties.getWebClientConfiguration().getClientId();
-        if(clientId == null) {
+        if (clientId == null) {
             throw new InvalidClientException("no client-id configured in application properties");
         }
         return clientId;
@@ -111,7 +111,7 @@ public abstract class OAuth2TokenEndpointClientAdapter implements OAuth2TokenEnd
      */
     protected String getTokenEndpoint() {
         String tokenEndpointUrl = jHipsterProperties.getSecurity().getClientAuthorization().getAccessTokenUri();
-        if(tokenEndpointUrl == null) {
+        if (tokenEndpointUrl == null) {
             throw new InvalidClientException("no token endpoint configured in application properties");
         }
         return tokenEndpointUrl;

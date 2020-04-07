@@ -9,11 +9,10 @@ import {
     metricsRoute,
     gatewayRoute,
     trackerRoute,
-    userMgmtRoute,
-    userDialogRoute
+    userMgmtRoute
 } from './';
 
-import { UserRouteAccessService } from '../shared';
+import { UserRouteAccessService } from 'app/core';
 
 const ADMIN_ROUTES = [
     auditsRoute,
@@ -27,13 +26,13 @@ const ADMIN_ROUTES = [
     metricsRoute
 ];
 
-export const adminState: Routes = [{
-    path: '',
-    data: {
-        authorities: ['ROLE_ADMIN']
-    },
-    canActivate: [UserRouteAccessService],
-    children: ADMIN_ROUTES
-},
-    ...userDialogRoute
+export const adminState: Routes = [
+    {
+        path: '',
+        data: {
+            authorities: ['ROLE_ADMIN']
+        },
+        canActivate: [UserRouteAccessService],
+        children: ADMIN_ROUTES
+    }
 ];

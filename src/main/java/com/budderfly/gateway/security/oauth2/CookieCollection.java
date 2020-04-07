@@ -41,10 +41,10 @@ public class CookieCollection implements Collection<Cookie> {
 
     @Override
     public boolean contains(Object o) {
-        if(o instanceof String) {
+        if (o instanceof String) {
             return cookieMap.containsKey(o);
         }
-        if(o instanceof Cookie) {
+        if (o instanceof Cookie) {
             return cookieMap.containsValue(o);
         }
         return false;
@@ -55,8 +55,8 @@ public class CookieCollection implements Collection<Cookie> {
         return cookieMap.values().iterator();
     }
 
-    public Cookie []toArray() {
-        Cookie []cookies=new Cookie[cookieMap.size()];
+    public Cookie[] toArray() {
+        Cookie[] cookies = new Cookie[cookieMap.size()];
         return toArray(cookies);
     }
 
@@ -67,7 +67,7 @@ public class CookieCollection implements Collection<Cookie> {
 
     @Override
     public boolean add(Cookie cookie) {
-        if(cookie==null) {
+        if (cookie == null) {
             return false;
         }
         cookieMap.put(cookie.getName(), cookie);
@@ -76,11 +76,11 @@ public class CookieCollection implements Collection<Cookie> {
 
     @Override
     public boolean remove(Object o) {
-        if(o instanceof String) {
+        if (o instanceof String) {
             return cookieMap.remove((String)o) != null;
         }
-        if(o instanceof Cookie) {
-            Cookie c=(Cookie)o;
+        if (o instanceof Cookie) {
+            Cookie c = (Cookie)o;
             return cookieMap.remove(c.getName()) != null;
         }
         return false;
@@ -93,7 +93,7 @@ public class CookieCollection implements Collection<Cookie> {
     @Override
     public boolean containsAll(Collection<?> collection) {
         for(Object o : collection) {
-            if(!contains(o)) {
+            if (!contains(o)) {
                 return false;
             }
         }
@@ -120,13 +120,13 @@ public class CookieCollection implements Collection<Cookie> {
 
     @Override
     public boolean retainAll(Collection<?> collection) {
-        boolean result=false;
-        Iterator<Map.Entry<String, Cookie>> it=cookieMap.entrySet().iterator();
+        boolean result = false;
+        Iterator<Map.Entry<String, Cookie>> it = cookieMap.entrySet().iterator();
         while(it.hasNext()) {
-            Map.Entry<String, Cookie> e=it.next();
-            if(!collection.contains(e.getKey()) && !collection.contains(e.getValue())) {
+            Map.Entry<String, Cookie> e = it.next();
+            if (!collection.contains(e.getKey()) && !collection.contains(e.getValue())) {
                 it.remove();
-                result=true;
+                result = true;
             }
         }
         return result;

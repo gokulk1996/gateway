@@ -2,6 +2,7 @@ package com.budderfly.gateway.security.oauth2;
 
 import com.budderfly.gateway.config.oauth2.OAuth2Properties;
 import com.budderfly.gateway.web.filter.RefreshTokenFilter;
+import com.budderfly.gateway.web.rest.errors.InvalidPasswordException;
 import io.github.jhipster.config.JHipsterProperties;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,7 +11,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.*;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -65,6 +66,7 @@ public class OAuth2AuthenticationServiceTest {
         OAuth2CookieHelper cookieHelper = new OAuth2CookieHelper(oAuth2Properties);
         OAuth2AccessToken accessToken = createAccessToken(ACCESS_TOKEN_VALUE, REFRESH_TOKEN_VALUE);
 
+        mockInvalidPassword();
         mockPasswordGrant(accessToken);
         mockRefreshGrant();
 
@@ -88,6 +90,19 @@ public class OAuth2AuthenticationServiceTest {
         Cookie refreshTokenCookie = new Cookie(OAuth2CookieHelper.REFRESH_TOKEN_COOKIE, REFRESH_TOKEN_VALUE);
         request.setCookies(accessTokenCookie, refreshTokenCookie);
         return request;
+    }
+
+    private void mockInvalidPassword() {
+        HttpHeaders reqHeaders = new HttpHeaders();
+        reqHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        reqHeaders.add("Authorization", CLIENT_AUTHORIZATION);                //take over Authorization header from client request to UAA request
+        MultiValueMap<String, String> formParams = new LinkedMultiValueMap<>();
+        formParams.set("username", "user");
+        formParams.set("password", "user2");
+        formParams.add("grant_type", "password");
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(formParams, reqHeaders);
+        when(restTemplate.postForEntity("http://uaa/oauth/token", entity, OAuth2AccessToken.class))
+            .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
     }
 
     private void mockPasswordGrant(OAuth2AccessToken accessToken) {
@@ -114,10 +129,6 @@ public class OAuth2AuthenticationServiceTest {
         OAuth2AccessToken newAccessToken = createAccessToken(NEW_ACCESS_TOKEN_VALUE, NEW_REFRESH_TOKEN_VALUE);
         when(restTemplate.postForEntity("http://uaa/oauth/token", entity, OAuth2AccessToken.class))
             .thenReturn(new ResponseEntity<OAuth2AccessToken>(newAccessToken, HttpStatus.OK));
-        //headers missing -> unauthorized
-        HttpEntity<MultiValueMap<String, String>> headerlessEntity = new HttpEntity<>(params, new HttpHeaders());
-        when(restTemplate.postForEntity("http://uaa/oauth/token", headerlessEntity, OAuth2AccessToken.class))
-            .thenThrow(new HttpClientErrorException(HttpStatus.UNAUTHORIZED));
     }
 
     @Test
@@ -155,6 +166,19 @@ public class OAuth2AuthenticationServiceTest {
         Cookie refreshTokenCookie = response.getCookie(OAuth2CookieHelper.SESSION_TOKEN_COOKIE);
         Assert.assertEquals(REFRESH_TOKEN_VALUE, OAuth2CookieHelper.getRefreshTokenValue(refreshTokenCookie));
         Assert.assertFalse(OAuth2CookieHelper.isRememberMe(refreshTokenCookie));
+    }
+
+    @Test
+    public void testInvalidPassword() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setServerName("www.test.com");
+        Map<String, String> params = new HashMap<>();
+        params.put("username", "user");
+        params.put("password", "user2");
+        params.put("rememberMe", "false");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        expectedException.expect(InvalidPasswordException.class);
+        authenticationService.authenticate(request, response, params);
     }
 
     @Test
